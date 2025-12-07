@@ -2,7 +2,8 @@
 
 A beautiful, interactive text-based adventure game built with HTML, CSS, and JavaScript.
 
-![Game Screenshot](screenshot.png)
+<img width="800" height="553" alt="image" src="https://github.com/user-attachments/assets/dba760dc-5d79-4b0a-9504-d2f6ef872d80" />
+
 
 ## 🎮 Features
 
