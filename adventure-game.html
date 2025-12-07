@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mysterious Island Adventure</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .game-container {
+            background: rgba(0, 0, 0, 0.85);
+            border: 3px solid #ffd700;
+            border-radius: 15px;
+            max-width: 800px;
+            width: 100%;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .game-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .game-title {
+            color: #ffd700;
+            font-size: 2.5em;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8);
+            margin-bottom: 10px;
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-label {
+            color: #aaa;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            color: #fff;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .health {
+            color: #ff4444;
+        }
+
+        .score {
+            color: #ffd700;
+        }
+
+        .inventory {
+            color: #44ff44;
+        }
+
+        .story-box {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid #555;
+            border-radius: 10px;
+            padding: 20px;
+            min-height: 200px;
+            margin-bottom: 20px;
+            color: #fff;
+            font-size: 1.1em;
+            line-height: 1.8;
+        }
+
+        .story-text {
+            margin-bottom: 15px;
+        }
+
+        .choices {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .choice-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: 2px solid #ffd700;
+            padding: 15px 25px;
+            font-size: 1.1em;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+
+        .choice-btn:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            transform: translateX(10px);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+        }
+
+        .choice-btn:active {
+            transform: translateX(10px) scale(0.98);
+        }
+
+        .input-section {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .text-input {
+            flex: 1;
+            padding: 15px;
+            font-size: 1.1em;
+            font-family: 'Courier New', monospace;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            color: white;
+        }
+
+        .text-input::placeholder {
+            color: #aaa;
+        }
+
+        .submit-btn {
+            padding: 15px 30px;
+            font-size: 1.1em;
+            font-family: 'Courier New', monospace;
+            background: #ffd700;
+            color: #000;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            background: #ffed4e;
+            transform: scale(1.05);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .victory {
+            color: #44ff44;
+            font-size: 1.5em;
+            text-align: center;
+            animation: pulse 1s infinite;
+        }
+
+        .game-over {
+            color: #ff4444;
+            font-size: 1.5em;
+            text-align: center;
+            animation: shake 0.5s;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-header">
+            <h1 class="game-title">🏝️ Mysterious Island Adventure 🏝️</h1>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat">
+                <div class="stat-label">Player</div>
+                <div class="stat-value" id="playerName">???</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Health</div>
+                <div class="stat-value health" id="health">100</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Score</div>
+                <div class="stat-value score" id="score">0</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Inventory</div>
+                <div class="stat-value inventory" id="inventory">Empty</div>
+            </div>
+        </div>
+
+        <div class="story-box">
+            <div id="storyText"></div>
+            <div id="choices" class="choices"></div>
+            <div id="inputSection" class="input-section hidden">
+                <input type="text" id="nameInput" class="text-input" placeholder="Enter your name...">
+                <button onclick="submitName()" class="submit-btn">Start Adventure</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let gameState = {
+            playerName: '',
+            health: 100,
+            score: 0,
+            inventory: []
+        };
+
+        function updateStats() {
+            document.getElementById('playerName').textContent = gameState.playerName || '???';
+            document.getElementById('health').textContent = gameState.health;
+            document.getElementById('score').textContent = gameState.score;
+            document.getElementById('inventory').textContent = gameState.inventory.length > 0 ? gameState.inventory.join(', ') : 'Empty';
+        }
+
+        function showStory(text) {
+            document.getElementById('storyText').innerHTML = `<div class="story-text">${text}</div>`;
+        }
+
+        function showChoices(choices) {
+            const choicesDiv = document.getElementById('choices');
+            choicesDiv.innerHTML = '';
+            choices.forEach(choice => {
+                const btn = document.createElement('button');
+                btn.className = 'choice-btn';
+                btn.textContent = choice.text;
+                btn.onclick = choice.action;
+                choicesDiv.appendChild(btn);
+            });
+        }
+
+        function startGame() {
+            showStory("Welcome to the Mysterious Island Adventure!<br><br>You are about to embark on a thrilling journey...");
+            document.getElementById('inputSection').classList.remove('hidden');
+            document.getElementById('choices').innerHTML = '';
+        }
+
+        function submitName() {
+            const name = document.getElementById('nameInput').value.trim();
+            if (name) {
+                gameState.playerName = name;
+                updateStats();
+                document.getElementById('inputSection').classList.add('hidden');
+                forestPath();
+            }
+        }
+
+        function forestPath() {
+            showStory(`Hello ${gameState.playerName}! Your journey begins...<br><br>You wake up on a mysterious island. A dark forest lies ahead.<br>You see two paths:`);
+            showChoices([
+                { text: '🌲 Take the left path (looks safer)', action: safePath },
+                { text: '⚠️ Take the right path (looks dangerous)', action: dangerousPath }
+            ]);
+        }
+
+        function safePath() {
+            showStory('You walk carefully through the trees...<br><br>You find a wooden chest!');
+            showChoices([
+                { text: '📦 Open the chest', action: openChest },
+                { text: '🚶 Ignore it and continue', action: skipChest }
+            ]);
+        }
+
+        function openChest() {
+            gameState.inventory.push('⚔️ sword');
+            gameState.score += 20;
+            updateStats();
+            showStory('You found a sword! (+20 points)<br><br>This might be useful later...');
+            setTimeout(caveEntrance, 2000);
+        }
+
+        function skipChest() {
+            showStory('You walk past the chest...<br><br>You continue deeper into the forest.');
+            setTimeout(caveEntrance, 2000);
+        }
+
+        function dangerousPath() {
+            showStory('You venture into the dark path...<br><br>🐻 A wild bear appears!');
+            
+            if (gameState.inventory.includes('⚔️ sword')) {
+                setTimeout(() => {
+                    gameState.score += 30;
+                    updateStats();
+                    showStory('You use your sword to scare it away! (+30 points)<br><br>The bear runs off into the woods.');
+                    setTimeout(caveEntrance, 2000);
+                }, 2000);
+            } else {
+                setTimeout(() => {
+                    gameState.health -= 30;
+                    updateStats();
+                    if (gameState.health > 0) {
+                        showStory('You run away but lose 30 health!<br><br>You barely escape with your life...');
+                        setTimeout(caveEntrance, 2000);
+                    } else {
+                        gameOver();
+                    }
+                }, 2000);
+            }
+        }
+
+        function caveEntrance() {
+            showStory('You arrive at a mysterious cave entrance...<br><br>Strange sounds echo from within. 🦇');
+            showChoices([
+                { text: '🔦 Enter the cave', action: insideCave },
+                { text: '🔍 Search around the entrance', action: searchEntrance }
+            ]);
+        }
+
+        function searchEntrance() {
+            gameState.health = Math.min(100, gameState.health + 20);
+            gameState.inventory.push('🧪 potion');
+            updateStats();
+            showStory('You found a healing potion! (+20 health)<br><br>You feel refreshed and ready to continue.');
+            setTimeout(insideCave, 2000);
+        }
+
+        function insideCave() {
+            showStory('Inside the cave, you see a glowing treasure chest guarded by a dragon! 🐉<br><br>What will you do?');
+            showChoices([
+                { text: '⚔️ Fight the dragon', action: fightDragon },
+                { text: '🤫 Try to sneak past', action: sneakPast },
+                { text: '🤝 Negotiate with the dragon', action: negotiate }
+            ]);
+        }
+
+        function fightDragon() {
+            if (gameState.inventory.includes('⚔️ sword')) {
+                gameState.score += 50;
+                updateStats();
+                showStory('You bravely fight with your sword!<br><br>⚔️ CLANG! SLASH! VICTORY! ⚔️<br><br>The dragon retreats! (+50 points)');
+                setTimeout(victory, 2000);
+            } else {
+                showStory('You have no weapon!<br><br>The dragon defeats you... 💀');
+                gameState.health = 0;
+                updateStats();
+                setTimeout(gameOver, 2000);
+            }
+        }
+
+        function sneakPast() {
+            const luck = Math.random() > 0.5;
+            if (luck) {
+                gameState.score += 40;
+                updateStats();
+                showStory('You successfully sneak past! (+40 points)<br><br>Your stealth skills are impressive!');
+                setTimeout(victory, 2000);
+            } else {
+                gameState.health -= 40;
+                updateStats();
+                if (gameState.health > 0) {
+                    showStory('The dragon spotted you! You lose 40 health!<br><br>But you manage to grab the treasure and escape!');
+                    setTimeout(victory, 2000);
+                } else {
+                    showStory('The dragon spotted you and defeats you... 💀');
+                    setTimeout(gameOver, 2000);
+                }
+            }
+        }
+
+        function negotiate() {
+            gameState.score += 60;
+            updateStats();
+            showStory('You offer friendship to the dragon...<br><br>🐉 The dragon is impressed by your courage! (+60 points)<br><br>The dragon lets you pass peacefully!');
+            setTimeout(victory, 2000);
+        }
+
+        function victory() {
+            showStory(`<div class="victory">
+                🎉 CONGRATULATIONS! 🎉<br><br>
+                ${gameState.playerName}, you've completed the adventure!<br><br>
+                Final Score: ${gameState.score}<br>
+                Health Remaining: ${gameState.health}<br>
+                Items Collected: ${gameState.inventory.join(', ') || 'None'}<br><br>
+                You are a true adventurer! 🏆
+            </div>`);
+            showChoices([
+                { text: '🔄 Play Again', action: () => location.reload() }
+            ]);
+        }
+
+        function gameOver() {
+            showStory(`<div class="game-over">
+                💀 GAME OVER 💀<br><br>
+                Your adventure ends here, ${gameState.playerName}...<br><br>
+                Final Score: ${gameState.score}<br><br>
+                Better luck next time!
+            </div>`);
+            showChoices([
+                { text: '🔄 Try Again', action: () => location.reload() }
+            ]);
+        }
+
+        // Start the game
+        startGame();
+    </script>
+</body>
+</html>
